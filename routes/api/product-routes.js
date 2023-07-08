@@ -90,7 +90,9 @@ router.put("/:id", async (req, res) => {
         .map((tag_id) => tag_id);
 
       await ProductTag.bulkCreate(productTagsAdd);
-      await ProductTag.destroy({ where: { tag_id: productTagIds_remove } });
+      await ProductTag.destroy({
+        where: { tag_id: productTagIds_remove, product_id: req.params.id },
+      });
     }
 
     res
@@ -109,7 +111,9 @@ router.delete("/:id", async (req, res) => {
     await Product.destroy({ where: { id: req.params.id } });
     await ProductTag.destroy({ where: { product_id: req.params.id } });
 
-    res.status(200).json(`The product of id ${req.params.id} is deleted.`);
+    res
+      .status(200)
+      .json(`The product of id ${req.params.id} is deleted successfully.`);
   } catch (err) {
     res.status(400).json(err);
   }
