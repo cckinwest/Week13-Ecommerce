@@ -10,11 +10,11 @@ router.get("/", async (req, res) => {
       include: [{ model: Product }],
     });
     if (!categoryData) {
-      res.status(404).json("No product data is found!");
+      res.status(200).json("No category data is found!");
     }
     res.status(200).json(categoryData);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
   // be sure to include its associated Products
 });
@@ -35,7 +35,7 @@ router.get("/:id", async (req, res) => {
         .json(`No category data is found for id = ${req.params.id}!`);
     }
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
   // be sure to include its associated Products
 });
@@ -47,19 +47,16 @@ router.post("/", async (req, res) => {
 
     res.status(200).json(categoryData);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
 });
 
 router.put("/:id", async (req, res) => {
   // update a category by its `id` value
   try {
-    const categoryData = await Category.update(
-      { category_name: req.body.category_name },
-      {
-        where: { id: req.params.id },
-      }
-    );
+    const categoryData = await Category.update(req.body, {
+      where: { id: req.params.id },
+    });
 
     if (categoryData) {
       res.status(200).json(categoryData);
@@ -69,27 +66,25 @@ router.put("/:id", async (req, res) => {
         .json(`No category data is found for id = ${req.params.id}!`);
     }
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
 });
 
 router.delete("/:id", async (req, res) => {
   // delete a category by its `id` value
   try {
-    const categoryData = await Category.destroy({
+    await Category.destroy({
       where: { id: req.params.id },
     });
 
-    if (categoryData) {
-      await Product.update(
-        { category_id: 0 },
-        { where: { category_id: req.params.id } }
-      );
+    await Product.update(
+      { category_id: null },
+      { where: { category_id: req.params.id } }
+    );
 
-      res.status(200).json(`The category with id ${req.params.id} is deleted.`);
-    }
+    res.status(200).json(`The category with id ${req.params.id} is deleted.`);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
 });
 

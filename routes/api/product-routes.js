@@ -76,8 +76,6 @@ router.put("/:id", async (req, res) => {
 
       const productTagIds = productTags.map(({ tag_id }) => tag_id);
 
-      console.log(productTagIds);
-
       const productTagsAdd = req.body.tagIds
         .filter((tag_id) => !productTagIds.includes(tag_id))
         .map((tag_id) => {
@@ -87,13 +85,9 @@ router.put("/:id", async (req, res) => {
           };
         });
 
-      console.log(productTagsAdd);
-
       const productTagIds_remove = productTagIds
         .filter((tag_id) => !req.body.tagIds.includes(tag_id))
         .map((tag_id) => tag_id);
-
-      console.log(productTagIds_remove);
 
       await ProductTag.bulkCreate(productTagsAdd);
       await ProductTag.destroy({ where: { tag_id: productTagIds_remove } });
@@ -112,10 +106,6 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   // delete one product by its `id` value
   try {
-    await Product.findAll({
-      where: { id: req.params.id },
-    });
-
     await Product.destroy({ where: { id: req.params.id } });
     await ProductTag.destroy({ where: { product_id: req.params.id } });
 
